@@ -58,18 +58,29 @@ services:
   db:
     image: mysql/mysql-server:8.0.13
     container_name: mysql-rico
-    command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
-      MYSQL_USER: 'test'
-      MYSQL_PASS: 'pass'
       MYSQL_ROOT_PASSWORD: 'put_something_here'
     volumes:
       - D:\local\sql\rico1\data:/var/lib/mysql
       - D:\local\sql\rico1\conf:/etc/mysql
 ```
+The ```container_name``` section specifies the name of this service, which we'll use in later docker commands that you'll see in the "Operations" section below.
+
+Depending on your situation, [you may want this in there too](https://mysqlserverteam.com/upgrading-to-mysql-8-0-default-authentication-plugin-considerations/), but I didn't use it:
+```yml
+command: --default-authentication-plugin=mysql_native_password
+```
+
 
 # 5. Operations
+* **Starting Server**
+    To bring the server up, use:
+    ```
+    docker-compose up --build
+    ```
+    The ```--build``` option is there so that it recognizes changes you've made to your **docker-compose.yml** file.  You won't need the --build there normally.
+
 * **Connecting from the command line**
     Connect a shell to the docker instance.
     ```
@@ -77,9 +88,14 @@ services:
     ```
     Notice the ```winpty``` command at the beginning.  This makes interactive shells work from git bash and similar shells based on mingw.  You might not need that depending on how you're connecting.  The normal command just starts with ```docker```.
 
-We're creating one volume for storing the mysql data on our D:\ drive, and another volume so we can inject our special mysql configuration.
-
-The above **docker-compose.yml** file will actually be just one part of several severices that make up our application.
+* **Starting a service composed of multiple compose files**
+The above **docker-compose.yml** file will actually be just one part of several severices that make up our application.  To start multiple services at once do something like this:
+    ```
+    docker-compose -f docker-compose.common.yml -f docker-compose.dev.yml up
+    ```
+    That launches multiple docker-compose files at once.
+    
+    For a lot more ideas about splitting your application into multiple sets of files, some of which are just for your local environment, and others which are only used in test and prod, see this awesome HackerNoon post about [Efficient Development with Docker and Docker-Compose](https://hackernoon.com/efficient-development-with-docker-and-docker-compose-e354b4d24831).
 
 # References
 * [MySQL Reference Manual: Problems with MySQL Socket](https://dev.mysql.com/doc/refman/8.0/en/problems-with-mysql-sock.html)
