@@ -1,6 +1,5 @@
 # Development Sql Setup
-Here's how to set up your local development sql instance.
-Note that these steps won't take place in the remote (prod and test) sql instances, because those will use managed hosting in the cloud.
+We want a MySQL instance running on our personal development machine which is Windows 10, but we need the data stored on another drive other than C:\\.  Note that these steps won't take place in the remote (prod and test) SQL instances, because those will use managed hosting in the cloud.
 
 ## Goals:
  * Host MySQL in a docker container under Windows 10.
@@ -58,7 +57,7 @@ version: '3'
 services:
   db:
     image: mysql/mysql-server:8.0.13
-    container_name: mysql
+    container_name: mysql-rico
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
@@ -70,20 +69,13 @@ services:
       - D:\local\sql\rico1\conf:/etc/mysql
 ```
 
-
-
 # 5. Operations
 * **Connecting from the command line**
     Connect a shell to the docker instance.
     ```
-    winpty docker exec -ti mysql bash
+    $ winpty docker exec -ti mysql-rico mysql -uroot -p
     ```
-
-    From that shell, do:
-    ```
-    mysql --socket /tmp/mysql.sock -uroot -p
-    ```
-
+    Notice the ```winpty``` command at the beginning.  This makes interactive shells work from git bash and similar shells based on mingw.  You might not need that depending on how you're connecting.  The normal command just starts with ```docker```.
 
 We're creating one volume for storing the mysql data on our D:\ drive, and another volume so we can inject our special mysql configuration.
 
