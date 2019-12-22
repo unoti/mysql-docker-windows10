@@ -36,7 +36,7 @@ Purpose of each of these folders:
 * **D:\local\sql\rico\conf** The configuration directory. It will contain a *my.cnf* for the server and client.
 
 # 2. Configuration
-Create **D:\local\sql\rico\my.cnf** with this:
+Create **D:\local\sql\rico\conf\my.cnf** with this:
 ```
 [mysqld]
 socket=/tmp/mysql-rico-sock
@@ -65,9 +65,13 @@ services:
       - D:\local\sql\rico1\data:/var/lib/mysql
       - D:\local\sql\rico1\conf:/etc/mysql
 ```
-The ```container_name``` section specifies the name of this service, which we'll use in later docker commands that you'll see in the "Operations" section below.
+Notes about changes you might want to make:
 
-Depending on your situation, [you may want this in there too](https://mysqlserverteam.com/upgrading-to-mysql-8-0-default-authentication-plugin-considerations/), but I didn't use it:
+* The ```container_name``` section specifies the name of this service, which we'll use in later docker commands that you'll see in the "Operations" section below.
+
+* I used a specific tag there on image, because I don't want my database upgrading without me thinking about it explicitly.  You might want to check what the latest container tag is and lock it in there.  8.0.13 is the latest as of the time of this writing.  You can also use ```:latest``` to pull in the latest, but note that it will replace the image with the latest whenever you do a build if you roll that way.
+
+* Depending on your situation, [you may want this in there too](https://mysqlserverteam.com/upgrading-to-mysql-8-0-default-authentication-plugin-considerations/), but I didn't use it:
 ```yml
 command: --default-authentication-plugin=mysql_native_password
 ```
@@ -75,11 +79,21 @@ command: --default-authentication-plugin=mysql_native_password
 
 # 5. Operations
 * **Starting Server**
-    To bring the server up, use:
+    * Bring the server up, with ^C to stop it:
     ```
     docker-compose up --build
     ```
     The ```--build``` option is there so that it recognizes changes you've made to your **docker-compose.yml** file.  You won't need the --build there normally.
+
+    * Bring the server up and leave it up:
+    ```
+    docker-compose up --detach
+    ```
+
+    * Stop the server
+    ```
+    docker-compose down
+    ```
 
 * **Connecting from the command line**
     Connect a shell to the docker instance.
